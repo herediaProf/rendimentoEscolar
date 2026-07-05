@@ -1,0 +1,25 @@
+# Ambientes Virtuais (Virtual Environments)
+.venv/
+venv/
+ENV/
+env/
+
+# Arquivos compilados do Python
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Banco de dados local de desenvolvimento (SQLite)
+*.sqlite3
+
+# Arquivos de ambiente e chaves secretas
+.env
+.secrets
+
+# Pastas de IDEs (VS Code, PyCharm)
+.vscode/
+.idea/
+
+# Arquivos de mídia/uploads locais (opcional, dependendo do projeto)
+media/
