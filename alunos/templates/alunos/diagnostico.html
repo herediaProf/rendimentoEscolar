@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EduAnalytica • Diagnóstico Clínico do Aluno</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = { production: true };
+    </script>
+    <style>
+      body {
+        background-color: #080b11;
+        color: #f3f4f6;
+      }
+      .dark-card {
+        background-color: #0f1622;
+        border: 1px solid #1e293b;
+      }
+    </style>
+  </head>
+  <body class="font-sans antialiased pb-12">
+    <header
+      class="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+    >
+      <div>
+        <div class="flex items-center gap-3">
+          <span
+            class="px-2.5 py-0.5 bg-purple-500/10 text-purple-400 text-xs font-semibold rounded-full border border-purple-500/20"
+          >
+            RA: {{ aluno.matricula|default:"Não Informado" }}
+          </span>
+          <span
+            class="px-2.5 py-0.5 bg-emerald-500/10 text-emerald-400 text-xs font-semibold rounded-full border border-emerald-500/20"
+          >
+            {{ aluno.situacao }}
+          </span>
+        </div>
+        <h1 class="text-2xl font-bold text-white uppercase tracking-wide mt-2">
+          Análise de Rendimento:
+          <span class="text-purple-400 font-light">{{ aluno.nome }}</span>
+        </h1>
+        <p class="text-sm text-gray-400 mt-1">
+          Ficha clínica individual para tomada de decisão e plano de
+          acompanhamento pedagógico.
+        </p>
+      </div>
+      <div>
+        <a
+          href="/dashboard/macro/"
+          class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-sm text-gray-300 font-medium rounded-lg border border-slate-700 transition-colors whitespace-nowrap"
+        >
+          ← Voltar para Visão Macro
+        </a>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 mt-8 space-y-8">
+      <div
+        class="dark-card p-6 rounded-xl shadow-lg border-l-4 border-amber-500"
+      >
+        <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+          🧠 Triagem e Ações Preventivas Recomendadas
+        </h3>
+        <p class="text-xs text-gray-400 mb-4">
+          Gatilhos automáticos baseados no cruzamento de notas, absenteísmo e
+          ranking da turma.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {% for alerta in alertas_intervencao %}
+          <div
+            class="p-4 rounded-lg bg-slate-900/60 border border-slate-800 flex flex-col justify-between"
+          >
+            <div>
+              <div class="flex justify-between items-start mb-2">
+                <span
+                  class="text-xs font-bold uppercase tracking-wider text-gray-300"
+                >
+                  {{ alerta.disciplina }} ({{ alerta.bimestre }}º Bimestre)
+                </span>
+                <span class="text-xs font-semibold"
+                  >{{ alerta.grau_risco }}</span
+                >
+              </div>
+              <p class="text-sm text-gray-400">{{ alerta.motivo }}</p>
+            </div>
+            <div
+              class="mt-4 pt-3 border-t border-slate-800/60 flex justify-end"
+            >
+              <button
+                class="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-xs font-medium text-white rounded transition-colors"
+              >
+                Iniciar Intervenção
+              </button>
+            </div>
+          </div>
+          {% empty %}
+          <div
+            class="col-span-2 p-4 text-center bg-emerald-500/5 rounded-lg border border-emerald-500/10 text-emerald-400 text-sm"
+          >
+            ✨ Nenhuma defasagem crítica ou alerta de frequência detectado para
+            este estudante.
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="dark-card rounded-xl shadow-lg overflow-hidden">
+        <div class="p-6 border-b border-slate-800 bg-slate-900/20">
+          <h3 class="text-lg font-bold text-white">
+            📋 Boletim de Evolução e Posição Comparativa
+          </h3>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr
+                class="border-b border-slate-800 text-slate-400 text-xs uppercase bg-slate-900/50 whitespace-nowrap"
+              >
+                <th class="p-4">Componente Curricular</th>
+                <th class="p-4 text-center">Bimestre</th>
+                <th class="p-4 text-center">Nota do Aluno</th>
+                <th class="p-4 text-center">Média da Turma</th>
+                <th class="p-4 text-center">Faltas Acumuladas</th>
+                <th class="p-4 text-center">Posição no Ranking</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800/60 text-sm">
+              {% for item in boletim_analitico %}
+              <tr class="hover:bg-slate-800/30 transition-colors">
+                <td class="p-4 font-medium text-gray-200">
+                  {{ item.disciplina }}
+                </td>
+                <td class="p-4 text-center font-mono text-gray-400">
+                  {{ item.bimestre }}ºB
+                </td>
+                <td
+                  class="p-4 text-center font-mono {% if item.nota_aluno >= 6.0 %}text-emerald-400{% else %}text-red-400{% endif %} font-semibold"
+                >
+                  {{ item.nota_aluno|default:"-"|floatformat:1 }}
+                </td>
+                <td class="p-4 text-center font-mono text-slate-400">
+                  {{ item.media_turma|default:"-"|floatformat:1 }}
+                </td>
+                <td
+                  class="p-4 text-center font-mono {% if item.faltas > 10 %}text-amber-400 font-bold{% else %}text-gray-400{% endif %}"
+                >
+                  {{ item.faltas }}
+                </td>
+                <td class="p-4 text-center">
+                  <span
+                    class="px-2 py-0.5 bg-slate-800 text-slate-300 rounded font-mono text-xs"
+                  >
+                    {{ item.ranking_posicao }}º / {{ item.total_alunos_turma }}
+                  </span>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="6" class="p-8 text-center text-gray-500 text-sm">
+                  Nenhum registro de notas ou faltas localizado para este aluno.
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
