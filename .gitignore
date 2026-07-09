@@ -23,3 +23,7 @@ env/
 
 # Arquivos de mídia/uploads locais (opcional, dependendo do projeto)
 media/
+
+*.csv
+*.xlsx
+*.xls
